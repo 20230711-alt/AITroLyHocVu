@@ -1,0 +1,6 @@
+{
+  "name": "Academia AI",
+  "description": "Trợ lý học vụ thông minh sử dụng AI giúp sinh viên quản lý học tập, tra cứu tài liệu và giải đáp thắc mắc học vụ.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

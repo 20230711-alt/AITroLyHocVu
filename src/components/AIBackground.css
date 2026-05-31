@@ -1,0 +1,76 @@
+.ai-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particles {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  background:
+    radial-gradient(circle,#00aaff 1px,transparent 1px);
+
+  background-size:40px 40px;
+
+  animation: moveBg 20s linear infinite;
+}
+
+@keyframes moveBg {
+  from{
+    transform:translateY(0);
+  }
+  to{
+    transform:translateY(-100px);
+  }
+}
+
+.glow{
+  position:absolute;
+  border-radius:50%;
+  filter:blur(120px);
+  z-index:1;
+}
+
+.glow-1{
+  width:500px;
+  height:500px;
+  background:#0066ff;
+  left:-150px;
+  top:100px;
+}
+
+.glow-2{
+  width:400px;
+  height:400px;
+  background:#00d4ff;
+  right:-100px;
+  bottom:50px;
+}
+
+.network{
+  position:absolute;
+  width:400px;
+  height:400px;
+
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:contain;
+
+  opacity:.35;
+  z-index:2;
+}
+
+.network-left{
+  left:-120px;
+  top:18%;
+}
+
+.network-right{
+  right:-120px;
+  bottom:10%;
+  transform:rotate(180deg);
+}
