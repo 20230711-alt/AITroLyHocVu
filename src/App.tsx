@@ -9,6 +9,7 @@ import {
 import { ScreenType, UserSession } from './types';
 
 import Header from './components/Header';
+import Sidebar from './components/Sidebar';
 
 import LandingView from './components/LandingView';
 import SettingsView from './components/SettingsView';
@@ -32,7 +33,7 @@ import NotificationView from './pages/student/NotificationView';
 import AdminDashboardView from './pages/admin/AdminDashboardView';
 import AnalyticsView from './pages/admin/AnalyticsView';
 export default function App() {
-  const [screen, setScreen] = useState<ScreenType>('PROFILE');
+  const [screen, setScreen] = useState<ScreenType>('STUDENT_DASHBOARD');
   const [user, setUser] = useState<UserSession | null>(null);
 
   const handleStartPrompt = () => {
@@ -45,7 +46,7 @@ export default function App() {
 
   const handleLoginSuccess = (session: UserSession) => {
     setUser(session);
-    setScreen('CHAT');
+    setScreen('STUDENT_DASHBOARD');
   };
 
   const handleLogout = () => {
@@ -83,12 +84,20 @@ export default function App() {
 
       case 'CHAT':
         return (
-          <ChatView
-            user={user}
-            onNavigateToFiles={() =>
-              setScreen('DOCUMENTS')
-            }
-          />
+          <div className="flex min-h-screen bg-[#020817]">
+            <Sidebar
+              currentScreen={screen}
+              setScreen={setScreen}
+              user={user}
+              onLogout={handleLogout}
+            />
+            <ChatView
+              user={user}
+              onNavigateToFiles={() =>
+                setScreen('DOCUMENTS')
+              }
+            />
+          </div>
         );
       case 'PROFILE':
   return (
@@ -115,11 +124,7 @@ export default function App() {
   );
   case 'SCHEDULE':
   return (
-    <ScheduleView
-      onBack={() =>
-        setScreen('STUDENT_DASHBOARD')
-      }
-    />
+    <ScheduleView />
   );
   case 'NOTIFICATION':
   return (
@@ -154,15 +159,45 @@ export default function App() {
   case 'ADMIN_DASHBOARD':
   return <AdminDashboardView />;
       case 'FAQ':
-        return <FAQView />;
+        return (
+          <div className="flex min-h-screen bg-[#020817]">
+            <Sidebar
+              currentScreen={screen}
+              setScreen={setScreen}
+              user={user}
+              onLogout={handleLogout}
+            />
+            <FAQView user={user} />
+          </div>
+        );
 
       case 'DOCUMENTS':
-        return <DocumentsView />;
+        return (
+          <div className="flex min-h-screen bg-[#020817]">
+            <Sidebar
+              currentScreen={screen}
+              setScreen={setScreen}
+              user={user}
+              onLogout={handleLogout}
+            />
+            <DocumentsView user={user} />
+          </div>
+        );
 
       case 'ANALYTICS':
         return <AnalyticsView />;
       case 'STUDENT_DASHBOARD':
-  return <StudentDashboardView />;
+        return (
+          <div className="flex min-h-screen bg-[#020817]">
+            <Sidebar
+              currentScreen={screen}
+              setScreen={setScreen}
+              user={user}
+              onLogout={handleLogout}
+            />
+            <StudentDashboardView onNavigate={setScreen} />
+          </div>
+        );
       default:
         return (
           <LandingView
@@ -176,10 +211,15 @@ export default function App() {
   const isAuthScreen =
     screen === 'LOGIN' ||
     screen === 'REGISTER';
+  const isSidebarScreen =
+    screen === 'STUDENT_DASHBOARD' ||
+    screen === 'CHAT' ||
+    screen === 'FAQ' ||
+    screen === 'DOCUMENTS';
 
   const showBottomNav =
     !isAuthScreen &&
-    ['LANDING', 'CHAT', 'FAQ', 'DOCUMENTS', 'ANALYTICS','STUDENT_DASHBOARD'].includes(
+    ['LANDING', 'ANALYTICS'].includes(
       screen
     );
 
@@ -188,10 +228,12 @@ export default function App() {
       className={
         isAuthScreen
           ? 'min-h-screen'
-          : 'min-h-screen bg-[#f8f9ff] text-[#0b1c30] flex flex-col justify-between font-sans pb-[76px]'
+          : isSidebarScreen
+            ? 'min-h-screen bg-[#020817] font-sans text-white'
+            : 'min-h-screen bg-[#f8f9ff] text-[#0b1c30] flex flex-col justify-between font-sans pb-[76px]'
       }
     >
-      {!isAuthScreen && (
+      {!isAuthScreen && !isSidebarScreen && (
         <Header
           currentScreen={screen}
           setScreen={setScreen}

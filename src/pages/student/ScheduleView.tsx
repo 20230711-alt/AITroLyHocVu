@@ -1,317 +1,311 @@
 import {
-  ArrowLeft,
-  Bell,
   Calendar,
-  User,
-  MapPin,
   BookOpen,
-  Sparkles,
-} from 'lucide-react';
-import AILayout from '../../components/AILayout';
+  Bell,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { useState } from "react";
 
-interface ScheduleViewProps {
-  onBack?: () => void;
-}
+export default function ScheduleView() {
+  const [currentWeek, setCurrentWeek] = useState(new Date(2026, 5, 1)); // June 1, 2026
 
-export default function ScheduleView({
-  onBack,
-}: ScheduleViewProps) {
-  const classes = [
+  // Schedule events with position data
+  const events = [
     {
-      status: 'Sắp diễn ra',
-      subject: 'Cơ sở dữ liệu',
-      teacher: 'Prof. Nguyễn Văn A',
-      room: 'Room A305',
-      time: '08:00 - 10:30',
+      title: "Co s? d? li?u",
+      time: "08:00 - 10:30",
+      room: "A305",
+      day: 0,
+      startHour: 8,
+      duration: 2.5,
+      color: "bg-blue-600",
     },
     {
-      status: '',
-      subject: 'Lập trình Web',
-      teacher: 'Prof. Trần Thị B',
-      room: 'Room B202',
-      time: '13:00 - 15:30',
+      title: "To�n r?i r?c",
+      time: "08:00 - 10:00",
+      room: "A101",
+      day: 1,
+      startHour: 8,
+      duration: 2,
+      color: "bg-purple-600",
     },
     {
-      status: 'Tối nay',
-      subject: 'Trí tuệ nhân tạo',
-      teacher: 'Prof. Lê Văn C',
-      room: 'Room Lab AI',
-      time: '17:00 - 19:00',
+      title: "Co s? d? li?u",
+      time: "08:00 - 10:30",
+      room: "A305",
+      day: 2,
+      startHour: 8,
+      duration: 2.5,
+      color: "bg-blue-600",
+    },
+    {
+      title: "To�n r?i r?c",
+      time: "08:00 - 10:00",
+      room: "A101",
+      day: 3,
+      startHour: 8,
+      duration: 2,
+      color: "bg-purple-600",
+    },
+    {
+      title: "K? thu?t ph?n m?m",
+      time: "10:30 - 12:00",
+      room: "B203",
+      day: 1,
+      startHour: 10.5,
+      duration: 1.5,
+      color: "bg-orange-600",
+    },
+    {
+      title: "K? thu?t ph?n m?m",
+      time: "10:30 - 12:00",
+      room: "B203",
+      day: 3,
+      startHour: 10.5,
+      duration: 1.5,
+      color: "bg-orange-600",
+    },
+    {
+      title: "L?p tr�nh Web",
+      time: "13:00 - 15:30",
+      room: "B202",
+      day: 0,
+      startHour: 13,
+      duration: 2.5,
+      color: "bg-green-600",
+    },
+    {
+      title: "C?u tr�c d? li?u v� gi?i thu?t",
+      time: "14:00 - 16:00",
+      room: "B202",
+      day: 1,
+      startHour: 14,
+      duration: 2,
+      color: "bg-cyan-600",
+    },
+    {
+      title: "C?u tr�c d? li?u v� gi?i thu?t",
+      time: "14:00 - 16:00",
+      room: "B202",
+      day: 3,
+      startHour: 14,
+      duration: 2,
+      color: "bg-cyan-600",
+    },
+    {
+      title: "L?p tr�nh Web",
+      time: "13:00 - 15:30",
+      room: "B202",
+      day: 2,
+      startHour: 13,
+      duration: 2.5,
+      color: "bg-green-600",
+    },
+    {
+      title: "Tr� tu? nh�n t?o",
+      time: "17:00 - 19:00",
+      room: "Lab AI",
+      day: 0,
+      startHour: 17,
+      duration: 2,
+      color: "bg-purple-600",
+    },
+    {
+      title: "Tr� tu? nh�n t?o",
+      time: "17:00 - 19:00",
+      room: "Lab AI",
+      day: 2,
+      startHour: 17,
+      duration: 2,
+      color: "bg-purple-600",
     },
   ];
 
-  const exams = [
+  const upcomingEvents = [
     {
-      name: 'Thi Cơ sở dữ liệu',
-      date: '15/06/2026',
+      title: "Co s? d? li?u",
+      time: "08:00 - 10:30",
+      room: "A305",
     },
     {
-      name: 'Thi Lập trình Web',
-      date: '20/06/2026',
+      title: "L?p tr�nh Web",
+      time: "13:00 - 15:30",
+      room: "B202",
+    },
+    {
+      title: "Tr� tu? nh�n t?o",
+      time: "17:00 - 19:00",
+      room: "Lab AI",
     },
   ];
+
+  const daysOfWeek = ["Th? Hai", "Th? Ba", "Th? Tu", "Th? Nam", "Th? S�u", "Th? B?y", "CN"];
+  const dates = [1, 2, 3, 4, 5, 6, 7]; // Mon-Sun
+
+  const hours = Array.from({ length: 12 }, (_, i) => `${String(7 + i).padStart(2, "0")}:00`);
 
   return (
-    <AILayout>
-      <div className="min-h-screen bg-[#020B1F] text-white pb-28">
-
-      {/* Header */}
-      <div className="bg-[#071B3D] px-5 py-4 flex justify-between items-center border-b border-white/10">
-
-        <div className="flex items-center gap-3">
-          <button onClick={onBack}>
-            <ArrowLeft size={22} />
-          </button>
-
-          <h1 className="font-bold text-lg">
-            Thời khóa biểu
-          </h1>
+    <div className="relative min-h-screen overflow-hidden bg-[#0a1428] text-white">
+      {/* HEADER */}
+      <div className="bg-[#0f1b2e] border-b border-white/10 px-6 py-4 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold">L?ch h?c</h1>
+          <p className="text-gray-400 text-sm">Xem th?i kh�a bi?u v� qu?n l� l?ch h?c</p>
         </div>
-
         <div className="flex items-center gap-4">
-          <Bell size={18} />
-
-          <img
-            src="https://i.pravatar.cc/100?img=12"
-            className="w-10 h-10 rounded-full border border-blue-500"
-          />
-        </div>
-
-      </div>
-
-      {/* Tabs */}
-      <div className="px-4 mt-5">
-        <div className="bg-white/5 rounded-2xl p-1 flex">
-
-          <button className="flex-1 bg-blue-600 py-3 rounded-xl font-medium">
-            Day View
-          </button>
-
-          <button className="flex-1 text-gray-400">
-            Week View
-          </button>
-
-        </div>
-      </div>
-
-      {/* Date */}
-      <div className="px-5 mt-5 flex items-center gap-3">
-
-        <Calendar size={20} className="text-blue-400" />
-
-        <span>
-          Hôm nay - Thứ Hai, 01/06/2026
-        </span>
-
-      </div>
-
-      {/* Timeline */}
-      <div className="px-5 mt-6">
-
-        {classes.map((item, index) => (
-          <div
-            key={index}
-            className="flex gap-4 mb-5"
-          >
-
-            <div className="flex flex-col items-center">
-
-              <div className="w-4 h-4 rounded-full bg-blue-500"></div>
-
-              {index !== classes.length - 1 && (
-                <div className="w-[2px] h-44 bg-gray-600"></div>
-              )}
-
-            </div>
-
-            <div className="flex-1 bg-white/5 border border-white/10 rounded-3xl p-5">
-
-              <div className="flex justify-between">
-
-                <span className="bg-blue-500/20 text-blue-300 text-xs px-3 py-1 rounded-full">
-                  {item.status}
-                </span>
-
-                <span className="text-gray-400">
-                  {item.time}
-                </span>
-
-              </div>
-
-              <h3 className="text-2xl font-semibold mt-4">
-                {item.subject}
-              </h3>
-
-              <div className="mt-4 space-y-2 text-gray-400">
-
-                <div className="flex items-center gap-2">
-                  <User size={16} />
-                  {item.teacher}
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <MapPin size={16} />
-                  {item.room}
-                </div>
-
-              </div>
-
-            </div>
-
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="T�m ki?m m�n h?c, ph�ng..."
+              className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm w-96 placeholder-gray-500 focus:outline-none focus:border-blue-500"
+            />
+            <Search size={18} className="absolute right-3 top-2.5 text-gray-500" />
           </div>
-        ))}
-
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 px-4">
-
-        <StatCard
-          title="Tổng môn tuần này"
-          value="12"
-        />
-
-        <StatCard
-          title="Tổng số tiết"
-          value="28"
-        />
-
-        <StatCard
-          title="Buổi học hôm nay"
-          value="2"
-        />
-
-        <StatCard
-          title="Phòng tiếp theo"
-          value="B202"
-        />
-
-      </div>
-
-      {/* Next Class */}
-      <div className="mx-4 mt-5 bg-gradient-to-r from-blue-600 to-blue-500 rounded-3xl p-5">
-
-        <div className="flex items-center gap-2 text-sm uppercase font-semibold">
-
-          <BookOpen size={18} />
-
-          Lớp học tiếp theo
-
+          <Bell size={20} className="text-gray-400 cursor-pointer" />
+          <img src="https://i.pravatar.cc/32?u=student" alt="Profile" className="w-8 h-8 rounded-full" />
         </div>
-
-        <h2 className="text-3xl font-bold mt-4">
-          Lập trình Web
-        </h2>
-
-        <p className="mt-2 text-white/90">
-          13:00 - 15:30 • Room B202
-        </p>
-
-        <div className="bg-white/20 rounded-xl p-3 w-fit mt-5">
-
-          <p className="text-sm">
-            Còn lại
-          </p>
-
-          <p className="font-bold text-xl">
-            2 giờ 15 phút
-          </p>
-
-        </div>
-
-        <button className="w-full bg-white text-blue-600 font-bold py-4 rounded-2xl mt-5">
-          Xem chi tiết
-        </button>
-
       </div>
 
-      {/* Exams */}
-      <div className="mx-4 mt-6 bg-white/5 border border-white/10 rounded-3xl p-5">
-
-        <h2 className="text-xl font-bold mb-4">
-          Lịch thi sắp tới
-        </h2>
-
-        <div className="space-y-3">
-
-          {exams.map((exam, index) => (
-            <div
-              key={index}
-              className="bg-white/5 rounded-2xl p-4 flex justify-between"
-            >
-
-              <span>{exam.name}</span>
-
-              <span className="text-gray-400">
-                {exam.date}
-              </span>
-
+      {/* CONTENT AREA */}
+      <main className="relative mx-auto w-full max-w-[1500px] px-5 py-8 h-[calc(100vh-100px)] flex gap-6">
+        {/* TIMETABLE */}
+        <div className="flex-1 flex flex-col">
+          {/* Toolbar */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <button className="p-1 hover:bg-white/10 rounded">
+                <ChevronLeft size={20} />
+              </button>
+              <span className="text-sm px-4">01/06/2026 - 07/06/2026</span>
+              <button className="p-1 hover:bg-white/10 rounded">
+                <ChevronRight size={20} />
+              </button>
             </div>
-          ))}
+            <button className="text-blue-400 text-sm hover:text-blue-300">H�m nay</button>
+          </div>
 
+          {/* Calendar Table */}
+          <div className="flex-1 flex flex-col bg-white/5 border border-white/10 rounded-lg overflow-hidden">
+            {/* Days Header */}
+            <div className="grid grid-cols-7 border-b border-white/10 bg-[#0f1b2e]">
+              {daysOfWeek.map((day, i) => (
+                <div key={day} className="border-r border-white/10 last:border-r-0 p-3 text-center">
+                  <div className="text-xs font-semibold text-gray-400">{day}</div>
+                  <div className="text-sm font-bold text-blue-400 mt-1">{dates[i]}/06</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Hours Grid Container */}
+            <div className="flex-1 overflow-y-auto relative">
+              <div className="grid grid-cols-7 gap-0 relative" style={{ minHeight: "100%" }}>
+                {/* Time Row Background */}
+                {Array.from({ length: 12 }).map((_, hourIdx) => (
+                  <div key={`row-bg-${hourIdx}`} className="col-span-7 grid grid-cols-7 h-20 border-b border-white/10 last:border-b-0">
+                    {Array.from({ length: 7 }).map((_, dayIdx) => (
+                      <div
+                        key={`cell-${hourIdx}-${dayIdx}`}
+                        className="border-r border-white/10 last:border-r-0 relative p-1"
+                      >
+                        {dayIdx === 0 && (
+                          <div className="text-xs text-gray-500 px-1">{hours[hourIdx]}</div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+
+                {/* Events Layer */}
+                {events.map((event, idx) => {
+                  const topPosition = (event.startHour - 7) * 5 + 0.5; // rem units
+                  const heightSize = event.duration * 5; // rem units
+                  const leftPercent = (event.day / 7) * 100;
+                  const widthPercent = (1 / 7) * 100;
+                  
+                  return (
+                    <div
+                      key={idx}
+                      className={`${event.color} absolute rounded border border-white/20 px-2 py-1 text-xs font-semibold text-white overflow-hidden cursor-pointer hover:opacity-90 transition z-10`}
+                      style={{
+                        left: `${leftPercent}%`,
+                        top: `${topPosition}rem`,
+                        width: `calc(${widthPercent}% - 0.25rem)`,
+                        height: `${heightSize}rem`,
+                        margin: "0 0.125rem",
+                      }}
+                    >
+                      <div className="font-bold text-[10px]">{event.title}</div>
+                      <div className="text-white/80 text-[9px]">{event.time}</div>
+                      <div className="text-white/70 text-[9px]">{event.room}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-4 gap-3 mt-4">
+            <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
+              <div className="text-2xl font-bold text-blue-400">3</div>
+              <div className="text-xs text-gray-400">M�n h?c</div>
+            </div>
+            <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
+              <div className="text-2xl font-bold text-blue-400">1</div>
+              <div className="text-xs text-gray-400">H�m nay</div>
+            </div>
+            <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
+              <div className="text-2xl font-bold text-blue-400">5</div>
+              <div className="text-xs text-gray-400">Tu?n n�y</div>
+            </div>
+            <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
+              <div className="text-2xl font-bold text-blue-400">12</div>
+              <div className="text-xs text-gray-400">T�n ch?</div>
+            </div>
+          </div>
         </div>
 
-        <button className="w-full mt-5 text-blue-400">
-          Xem toàn bộ lịch thi
-        </button>
+        {/* RIGHT SIDEBAR */}
+        <div className="w-72 flex flex-col gap-4 overflow-y-auto">
+          {/* Mini Calendar */}
+          <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+            <h3 className="font-semibold mb-3">Th�ng 6, 2026</h3>
+            <div className="grid grid-cols-7 gap-2 text-center">
+              {Array.from({ length: 30 }).map((_, i) => (
+                <button
+                  key={i}
+                  className={`w-8 h-8 rounded text-xs font-semibold ${
+                    i + 1 === 1 ? "bg-blue-600 text-white" : "hover:bg-white/10"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          </div>
 
-      </div>
+          {/* Upcoming Events */}
+          <div className="bg-white/5 border border-white/10 rounded-lg p-4 flex-1">
+            <h3 className="font-semibold mb-3">S?p t?i</h3>
+            <div className="space-y-3">
+              {upcomingEvents.map((event, idx) => (
+                <div key={idx} className="bg-white/5 border border-white/10 rounded p-3 hover:bg-white/10 cursor-pointer">
+                  <div className="font-semibold text-sm">{event.title}</div>
+                  <div className="text-xs text-gray-400 mt-1">{event.time}</div>
+                  <div className="text-xs text-gray-500">{event.room}</div>
+                </div>
+              ))}
+            </div>
+          </div>
 
-      {/* AI */}
-      <div className="mx-4 mt-6 bg-white/5 border border-white/10 rounded-3xl p-5">
-
-        <div className="flex items-center gap-2 mb-4">
-
-          <Sparkles />
-
-          <h2 className="font-bold text-xl">
-            Hỏi AI về lịch trình
-          </h2>
-
+          {/* Add event button */}
+          <button className="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-lg font-semibold text-sm">
+            Xem to�n b? l?ch
+          </button>
         </div>
-
-        <div className="flex flex-wrap gap-2">
-
-          {[
-            'Hôm nay tôi học những môn nào?',
-            'Tuần này có bao nhiêu buổi học?',
-            'Khi nào tôi có tiết học tiếp theo?',
-          ].map((item) => (
-            <button
-              key={item}
-              className="bg-white/10 px-4 py-2 rounded-full text-sm"
-            >
-              {item}
-            </button>
-          ))}
-
-        </div>
-
-      </div>
-
-      </div>
-    </AILayout>
-  );
-}
-
-function StatCard({
-  title,
-  value,
-}: {
-  title: string;
-  value: string;
-}) {
-  return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-
-      <p className="text-gray-400 text-sm">
-        {title}
-      </p>
-
-      <h3 className="text-3xl font-bold mt-3 text-blue-400">
-        {value}
-      </h3>
-
+      </main>
     </div>
   );
 }

@@ -1,282 +1,348 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  Bell,
+  Bot,
+  Calculator,
+  Calendar,
+  ChevronDown,
+  FileText,
+  GraduationCap,
+  HelpCircle,
+  Paperclip,
+  Search,
+  Send,
+  Sparkles,
+} from 'lucide-react';
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Send, FileText, Calendar, GraduationCap, Sparkles, Loader2, Paperclip, HelpCircle, ArrowRight, Percent } from 'lucide-react';
 import { ChatMessage, UserSession } from '../../types';
-import AILayout from '../../components/AILayout';
 
 interface ChatViewProps {
   user: UserSession | null;
   onNavigateToFiles: () => void;
 }
 
-export default function ChatView({ user, onNavigateToFiles }: ChatViewProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: '1',
-      sender: 'ai',
-      text: 'Chào Alex! Mình là Academia AI. Hôm nay mình có thể hỗ trợ gì cho việc học của bạn nào?',
-      time: '09:00 AM'
-    },
-    {
-      id: '2',
-      sender: 'user',
-      text: 'Cho mình hỏi về thời hạn đóng học phí học kỳ này và lịch học môn Cơ sở dữ liệu nhé.',
-      time: '09:01 AM'
-    },
-    {
-      id: '3',
-      sender: 'ai',
-      text: 'Được chứ! Dưới đây là thông tin mình tìm thấy trong hồ sơ của bạn:',
-      time: '09:01 AM',
-      widgets: [
-        {
-          type: 'tuition',
-          title: 'THỜI HẠN HỌC PHÍ',
-          details: ['Hạn chót: 25/12/2024']
-        },
-        {
-          type: 'schedule',
-          title: 'LỊCH HỌC: CƠ SỞ DỮ LIỆU',
-          details: [
-            'Thứ 3 & Thứ 5 | 08:00 - 10:30',
-            'Phòng: B.402 (Tòa nhà Trung tâm)'
-          ]
-        }
-      ]
-    }
-  ]);
+const initialMessages: ChatMessage[] = [
+  {
+    id: '1',
+    sender: 'ai',
+    text: 'Chào Alex! Mình là Academia AI. Hôm nay mình có thể hỗ trợ gì cho việc học của bạn nào?',
+    time: '09:00 AM',
+  },
+  {
+    id: '2',
+    sender: 'user',
+    text: 'Cho mình hỏi về thời hạn đóng học phí học kỳ này và lịch học môn Cơ sở dữ liệu nhé.',
+    time: '09:01 AM',
+  },
+  {
+    id: '3',
+    sender: 'ai',
+    text: 'Được chứ! Dưới đây là thông tin mình tìm thấy trong hồ sơ của bạn:',
+    time: '09:01 AM',
+    widgets: [
+      {
+        type: 'tuition',
+        title: 'THỜI HẠN HỌC PHÍ',
+        details: ['Hạn chót: 25/12/2024'],
+      },
+      {
+        type: 'schedule',
+        title: 'LỊCH HỌC: CƠ SỞ DỮ LIỆU',
+        details: [
+          'Thứ 3 & Thứ 5 | 08:00 - 10:30',
+          'Phòng: B.402 (Tòa nhà Trung tâm)',
+        ],
+      },
+    ],
+  },
+];
 
+export default function ChatView({ user, onNavigateToFiles }: ChatViewProps) {
+  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const displayName = user?.name || 'Thùy Linh';
+  const avatar = user?.avatar || 'https://i.pravatar.cc/150?img=32';
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isTyping]);
 
   const formatTime = () => {
     const now = new Date();
     let hours = now.getHours();
     const minutes = now.getMinutes();
     const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12; // the hour '0' should be '12'
-    const minutesStr = minutes < 10 ? '0' + minutes : minutes;
-    return `${hours}:${minutesStr} ${ampm}`;
+
+    hours %= 12;
+    hours = hours || 12;
+
+    return `${hours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
   };
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const handleSend = async (prompt?: string) => {
+    const text = (prompt || inputText).trim();
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, isTyping]);
+    if (!text) {
+      return;
+    }
 
-  const handleSend = async (textToSend?: string) => {
-    const text = (textToSend || inputText).trim();
-    if (!text) return;
-
-    if (!textToSend) {
+    if (!prompt) {
       setInputText('');
     }
 
-    // Reset textarea height
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-    }
-
-    const userMsg: ChatMessage = {
-      id: Math.random().toString(),
+    const userMessage: ChatMessage = {
+      id: crypto.randomUUID(),
       sender: 'user',
-      text: text,
-      time: formatTime()
+      text,
+      time: formatTime(),
     };
 
-    setMessages(prev => [...prev, userMsg]);
+    setMessages((currentMessages) => [...currentMessages, userMessage]);
     setIsTyping(true);
 
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [...messages, userMsg] })
+        body: JSON.stringify({ messages: [...messages, userMessage] }),
       });
-
       const data = await response.json();
-      setIsTyping(false);
 
-      if (data.reply) {
-        setMessages(prev => [
-          ...prev, 
-          {
-            id: Math.random().toString(),
-            sender: 'ai',
-            text: data.reply,
-            time: formatTime()
-          }
-        ]);
-      } else {
-        throw new Error("Invalid reply format");
-      }
-    } catch (err) {
-      setIsTyping(false);
-      setMessages(prev => [
-        ...prev,
+      setMessages((currentMessages) => [
+        ...currentMessages,
         {
-          id: Math.random().toString(),
+          id: crypto.randomUUID(),
           sender: 'ai',
-          text: 'Rất tiếc, đường truyền kết nối máy chủ AI đang bận. Bạn vui lòng gửi lại câu hỏi trong giây lát nhé!',
-          time: formatTime()
-        }
+          text:
+            data.reply ||
+            'Mình đã ghi nhận câu hỏi của bạn. Bạn có thể hỏi thêm về lịch học, học phí hoặc tài liệu.',
+          time: formatTime(),
+        },
       ]);
+    } catch (error) {
+      console.error(error);
+      setMessages((currentMessages) => [
+        ...currentMessages,
+        {
+          id: crypto.randomUUID(),
+          sender: 'ai',
+          text: 'Rất tiếc, kết nối máy chủ AI đang bận. Bạn vui lòng gửi lại câu hỏi trong giây lát nhé!',
+          time: formatTime(),
+        },
+      ]);
+    } finally {
+      setIsTyping(false);
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
       handleSend();
     }
   };
 
-  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInputText(e.target.value);
-    // Auto grow height
-    const tx = e.target;
-    tx.style.height = 'auto';
-    tx.style.height = Math.min(tx.scrollHeight, 120) + 'px';
-  };
+  return (
+    <div className="relative min-h-screen flex-1 overflow-hidden bg-[#020817] text-white">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_68%_18%,rgba(0,140,255,.16),transparent_30%),radial-gradient(circle_at_82%_70%,rgba(0,212,255,.1),transparent_28%)]" />
 
-  const handleSuggestion = (prompt: string) => {
-    handleSend(prompt);
-  };
+      <main className="relative mx-auto flex h-screen w-full max-w-[1500px] flex-col px-5 py-8 lg:px-8">
+        <header className="mb-8 flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
+          <div>
+            <h1 className="text-3xl font-black md:text-4xl">Trợ lý AI</h1>
+            <p className="mt-4 text-base text-slate-400">
+              Hỏi gì cũng có câu trả lời
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-5">
+            <label className="relative block w-full min-w-[280px] max-w-md sm:w-[430px]">
+              <Search
+                size={24}
+                className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-200"
+              />
+              <input
+                type="search"
+                placeholder="Tìm kiếm..."
+                className="h-14 w-full rounded-2xl border border-cyan-500/30 bg-[#041534]/75 pl-6 pr-14 text-white outline-none placeholder:text-slate-400 focus:border-cyan-300 focus:ring-2 focus:ring-cyan-400/20"
+              />
+            </label>
+
+            <button
+              type="button"
+              className="relative flex h-12 w-12 items-center justify-center rounded-full text-white hover:bg-white/10"
+              aria-label="Thông báo"
+            >
+              <Bell size={24} />
+              <span className="absolute right-1 top-0 flex h-6 min-w-6 items-center justify-center rounded-full bg-rose-500 px-1 text-xs font-bold">
+                3
+              </span>
+            </button>
+
+            <button
+              type="button"
+              className="flex items-center gap-3 rounded-2xl px-2 py-1 hover:bg-white/10"
+            >
+              <img
+                src={avatar}
+                alt={displayName}
+                className="h-12 w-12 rounded-full border border-cyan-300/40 object-cover"
+                referrerPolicy="no-referrer"
+              />
+              <span className="font-semibold">{displayName}</span>
+              <ChevronDown size={18} />
+            </button>
+          </div>
+        </header>
+
+        <section className="flex-1 overflow-y-auto px-1 pb-5">
+          <div className="mx-auto flex w-full max-w-5xl flex-col gap-5">
+            {messages.map((message) => (
+              <MessageBubble key={message.id} message={message} />
+            ))}
+
+            {isTyping && (
+              <div className="max-w-3xl rounded-2xl border border-cyan-500/25 bg-[#061638]/80 p-5 text-slate-300">
+                Academia AI đang phản hồi...
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
+          </div>
+        </section>
+
+        <footer className="mx-auto w-full max-w-5xl shrink-0 pt-5">
+          <div className="mb-5 flex flex-wrap justify-center gap-4">
+            <QuickAction
+              icon={<FileText size={18} />}
+              label="Tóm tắt bài giảng"
+              onClick={() => handleSend('Tóm tắt bài giảng file tài liệu PDF')}
+            />
+            <QuickAction
+              icon={<HelpCircle size={18} />}
+              label="Tạo câu hỏi ôn tập"
+              onClick={() => handleSend('Tạo bộ câu hỏi ôn tập thi cuối kỳ')}
+            />
+            <QuickAction
+              icon={<Calculator size={18} />}
+              label="Tính điểm GPA dự kiến"
+              onClick={() => handleSend('Tính điểm GPA dự kiến kỳ học')}
+            />
+            <QuickAction
+              icon={<Sparkles size={18} />}
+              label="Gợi ý tài liệu"
+              onClick={onNavigateToFiles}
+            />
+          </div>
+
+          <div className="flex items-center gap-3 rounded-2xl border border-cyan-500/25 bg-[#061638]/85 p-3 shadow-[0_0_28px_rgba(0,140,255,.12)]">
+            <button
+              type="button"
+              onClick={onNavigateToFiles}
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-slate-300 hover:bg-cyan-500/10 hover:text-cyan-300"
+              aria-label="Đính kèm tài liệu"
+            >
+              <Paperclip size={24} />
+            </button>
+
+            <input
+              value={inputText}
+              onChange={(event) => setInputText(event.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Hãy hỏi mình về thời hạn, lịch học, bài tập, tài liệu..."
+              className="h-12 min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-slate-500"
+            />
+
+            <button
+              type="button"
+              onClick={() => handleSend()}
+              disabled={!inputText.trim() || isTyping}
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-[0_0_18px_rgba(0,140,255,.35)] transition-all hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+              aria-label="Gửi câu hỏi"
+            >
+              <Send size={22} />
+            </button>
+          </div>
+        </footer>
+      </main>
+    </div>
+  );
+}
+
+function MessageBubble({ message }: { message: ChatMessage }) {
+  const isAI = message.sender === 'ai';
+
+  if (!isAI) {
+    return (
+      <div className="ml-auto flex w-full max-w-4xl flex-col items-end gap-2">
+        <div className="rounded-2xl bg-blue-600 px-6 py-5 text-base leading-8 text-white shadow-[0_0_24px_rgba(0,90,255,.25)]">
+          {message.text}
+        </div>
+        <span className="text-sm text-slate-400">{message.time}</span>
+      </div>
+    );
+  }
 
   return (
-    <AILayout>
-      <div className="w-full flex-grow flex flex-col justify-between max-w-4xl mx-auto h-[calc(100vh-72px)] overflow-hidden bg-transparent">
-      {/* Messages Canvas Scroll Area */}
-      <div className="flex-grow overflow-y-auto px-6 py-6 space-y-6 scrollbar-none pb-40">
-        {messages.map((msg, index) => {
-          const isAI = msg.sender === 'ai';
-          return (
-            <div 
-              key={msg.id} 
-              className={`flex flex-col gap-1.5 w-full max-w-[85%] ${isAI ? 'self-start animate-fade-in-left' : 'self-end items-end ml-auto animate-fade-in-right'}`}
-            >
-              {/* Message box */}
-              <div 
-                className={`p-4 rounded-2xl shadow-sm ${
-                  isAI 
-                    ? 'bg-white border-l-4 border-[#004ac6] text-[#0b1c30] rounded-tl-none' 
-                    : 'bg-[#2563eb] text-white rounded-tr-none'
-                }`}
-              >
-                <div className="text-sm font-sans leading-relaxed whitespace-pre-wrap">{msg.text}</div>
-                
-                {/* Academic Context Widgets block */}
-                {isAI && msg.widgets && msg.widgets.length > 0 && (
-                  <div className="mt-4 space-y-3">
-                    {msg.widgets.map((widget, widx) => (
-                      <div 
-                        key={widx} 
-                        className="bg-[#eff4ff]/50 border border-[#c3c6d7]/30 p-3.5 rounded-xl flex flex-col gap-1 hover:border-[#2563eb]/25 transition-all"
-                      >
-                        <div className="flex items-center gap-2 mb-1.5 text-[#004ac6] font-bold">
-                          {widget.type === 'tuition' ? (
-                            <Calendar className="w-4 h-4" />
-                          ) : (
-                            <GraduationCap className="w-4.5 h-4.5" />
-                          )}
-                          <span className="text-[11px] font-sans tracking-wide uppercase font-black">{widget.title}</span>
-                        </div>
-                        {widget.details.map((detail, didx) => (
-                          <p key={didx} className="text-xs text-[#434655] font-semibold">{detail}</p>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              
-              <span className="text-[10px] font-sans font-bold text-[#737686] px-1">{msg.time}</span>
-            </div>
-          );
-        })}
+    <div className="flex w-full max-w-4xl flex-col gap-2">
+      <div className="rounded-2xl border border-cyan-500/25 bg-[#061638]/80 p-5 shadow-[0_0_24px_rgba(0,140,255,.12)]">
+        <div className="mb-3 flex items-center gap-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-400/40 bg-blue-600/25 text-cyan-300">
+            <Bot size={22} />
+          </div>
+          <p className="text-base leading-8 text-slate-100">{message.text}</p>
+        </div>
 
-        {/* AI Typing Indicator block */}
-        {isTyping && (
-          <div className="flex flex-col gap-1.5 self-start max-w-[85%]">
-            <div className="bg-white border-l-4 border-[#004ac6] p-4 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-2">
-              <Loader2 className="w-4.5 h-4.5 text-[#004ac6] animate-spin" />
-              <span className="text-xs font-sans text-[#737686] font-bold">Academia AI đang phản hồi...</span>
-            </div>
+        {message.widgets && (
+          <div className="mt-5 space-y-4">
+            {message.widgets.map((widget) => (
+              <div
+                key={widget.title}
+                className="rounded-2xl border border-cyan-500/20 bg-[#031434]/80 p-5"
+              >
+                <h3 className="mb-4 flex items-center gap-3 text-base font-black text-cyan-400">
+                  {widget.type === 'tuition' ? (
+                    <Calendar size={20} />
+                  ) : (
+                    <GraduationCap size={20} />
+                  )}
+                  {widget.title}
+                </h3>
+                <div className="space-y-2 text-base text-slate-100">
+                  {widget.details.map((detail) => (
+                    <p key={detail}>{detail}</p>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         )}
-
-        <div ref={messagesEndRef} />
       </div>
+      <span className="text-sm text-slate-400">{message.time}</span>
+    </div>
+  );
+}
 
-      {/* Floating Bottom Suggestion Chips and Input box bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 max-w-4xl mx-auto px-6 pb-6 pt-2 bg-gradient-to-t from-[#f8f9ff] via-[#f8f9ff]/90 to-transparent">
-        {/* Suggestion Prompt Chips */}
-        <div className="flex gap-2.5 overflow-x-auto pb-3 mx-1 no-scrollbar mask-gradient-overlay flex-nowrap shrink-0">
-          <button 
-            type="button"
-            onClick={() => handleSuggestion("Tóm tắt bài giảng file tài liệu PDF")}
-            className="flex-shrink-0 bg-white hover:bg-[#eff4ff] border border-[#c3c6d7]/40 px-4 py-2 rounded-full text-[#434655] hover:text-[#004ac6] text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
-          >
-            <FileText className="w-3.5 h-3.5" />
-            Tóm tắt bài giảng
-          </button>
-          <button 
-            type="button"
-            onClick={() => handleSuggestion("Tạo bộ câu hỏi ôn tập thi cuối kỳ")}
-            className="flex-shrink-0 bg-white hover:bg-[#eff4ff] border border-[#c3c6d7]/40 px-4 py-2 rounded-full text-[#434655] hover:text-[#004ac6] text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
-          >
-            <HelpCircle className="w-3.5 h-3.5" />
-            Tạo câu hỏi ôn tập
-          </button>
-          <button 
-            type="button"
-            onClick={() => handleSuggestion("Tính chỉ số GPA dự kiến kỳ học")}
-            className="flex-shrink-0 bg-white hover:bg-[#eff4ff] border border-[#c3c6d7]/40 px-4 py-2 rounded-full text-[#434655] hover:text-[#004ac6] text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
-          >
-            <Percent className="w-3.5 h-3.5" />
-            Tính điểm GPA dự kiến
-          </button>
-        </div>
-
-        {/* Input Bar panel */}
-        <div className="relative flex items-center bg-white border border-[#c3c6d7]/50 rounded-[24px] p-2.5 shadow-xl ring-2 ring-blue-500/5">
-          <button 
-            onClick={onNavigateToFiles}
-            className="w-10 h-10 flex items-center justify-center text-[#737686] hover:text-[#004ac6] transition-colors rounded-full hover:bg-[#eff4ff] cursor-pointer" 
-            title="Đến kho tài liệu tải lên"
-          >
-            <Paperclip className="w-5 h-5" />
-          </button>
-          <textarea 
-            ref={textareaRef}
-            rows={1}
-            value={inputText}
-            onChange={handleInput}
-            onKeyDown={handleKeyPress}
-            className="flex-1 bg-transparent border-none focus:ring-0 text-[#0b1c30] text-sm py-2 px-1 focus:outline-none resize-none max-h-[120px] font-medium placeholder:text-[#cbd4e1]"
-            placeholder="Hãy hỏi mình về thời hạn học phí, lịch học, hỗ trợ bài tập..."
-          />
-          <button 
-            onClick={() => handleSend()}
-            disabled={!inputText.trim()}
-            className="w-10 h-10 bg-[#004ac6] disabled:bg-blue-300 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-[#2563eb] transition-all cursor-pointer shadow-blue-500/10 shrink-0" 
-            title="Gửi câu hỏi"
-          >
-            <Send className="w-4 h-4 -mr-0.5" />
-          </button>
-        </div>
-      </div>
-      </div>
-    </AILayout>
+function QuickAction({
+  icon,
+  label,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex h-14 items-center gap-3 rounded-xl border border-cyan-500/25 bg-[#061638]/80 px-5 text-sm font-semibold text-white transition-all hover:border-cyan-300 hover:bg-blue-600/35"
+    >
+      <span className="text-cyan-300">{icon}</span>
+      {label}
+    </button>
   );
 }

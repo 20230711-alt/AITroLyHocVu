@@ -7,9 +7,8 @@ const router = express.Router();
 router.post("/register", async (req, res) => {
 
   const {
-    hoTen,
+    tenDangNhap,
     email,
-    maSinhVien,
     matKhau
   } = req.body;
 
@@ -20,19 +19,17 @@ router.post("/register", async (req, res) => {
 
   db.query(
     `
-    INSERT INTO TaiKhoan
+    INSERT INTO taikhoan
     (
-      HoTen,
+      TenDangNhap,
       Email,
-      MaSinhVien,
       MatKhau
     )
-    VALUES (?, ?, ?, ?)
+    VALUES (?, ?, ?)
     `,
     [
-      hoTen,
+      tenDangNhap,
       email,
-      maSinhVien,
       hash
     ],
     (err) => {
@@ -42,13 +39,14 @@ router.post("/register", async (req, res) => {
       }
 
       res.json({
+        success: true,
         message: "Đăng ký thành công"
       });
     }
   );
+
 });
 
-module.exports = router;
 router.post("/login", (req,res)=>{
 
   const {
@@ -96,3 +94,5 @@ router.post("/login", (req,res)=>{
   );
 
 });
+
+module.exports = router;

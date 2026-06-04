@@ -14,6 +14,7 @@ import {
   Settings,
 } from 'lucide-react';
 import AILayout from '../../components/AILayout';
+import { getGoogleUser } from '../../services/localStorageService';
 
 interface ProfileViewProps {
   onBack?: () => void;
@@ -24,6 +25,12 @@ export default function ProfileView({
   onBack,
   onLogout,
 }: ProfileViewProps) {
+  const googleUser = getGoogleUser();
+  const profileAvatar =
+    googleUser.avatar || 'https://i.pravatar.cc/300?img=32';
+  const profileName = googleUser.name || 'Nguyễn Thùy Linh';
+  const profileEmail = googleUser.email || 'linh@student.eaut.edu.vn';
+
   return (
     <AILayout>
       <div className="min-h-screen bg-gradient-to-b from-[#04152E] via-[#071B3D] to-[#021024] text-white pb-28">
@@ -42,8 +49,8 @@ export default function ProfileView({
         </div>
 
         <img
-          src="https://i.pravatar.cc/150?img=32"
-          alt=""
+          src={profileAvatar}
+          alt={profileName}
           className="w-11 h-11 rounded-full border-2 border-blue-500"
         />
       </div>
@@ -53,8 +60,8 @@ export default function ProfileView({
 
         <div className="relative">
           <img
-            src="https://i.pravatar.cc/300?img=32"
-            alt=""
+            src={profileAvatar}
+            alt={profileName}
             className="w-32 h-32 rounded-3xl border-4 border-blue-500"
           />
 
@@ -64,8 +71,14 @@ export default function ProfileView({
         </div>
 
         <h2 className="text-5xl font-bold mt-5">
-          Nguyễn Thùy Linh
+          {profileName}
         </h2>
+
+        {googleUser.email && (
+          <p className="text-cyan-100/80 mt-2">
+            {profileEmail}
+          </p>
+        )}
 
         <p className="text-gray-400 mt-2">
           MSSV: 212480201001
@@ -143,7 +156,7 @@ export default function ProfileView({
           <ProfileItem
             icon={<Mail size={20} />}
             label="Email"
-            value="linh@student.eaut.edu.vn"
+            value={profileEmail}
           />
 
           <ProfileItem

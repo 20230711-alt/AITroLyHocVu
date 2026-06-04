@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   BarChart3,
   Eye,
@@ -11,6 +11,15 @@ import {
 } from 'lucide-react';
 
 import AILayout from '../../components/AILayout';
+import { loginWithGoogle } from '../../services/authService';
+import {
+  getEmailSuggestions,
+  getRememberEmail,
+  removeRememberEmail,
+  saveEmailSuggestion,
+  saveGoogleUser,
+  saveRememberEmail,
+} from '../../services/localStorageService';
 import { UserSession } from '../../types';
 
 interface LoginViewProps {
@@ -37,7 +46,19 @@ export default function LoginView({
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [emailSuggestions, setEmailSuggestions] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const savedEmail = getRememberEmail();
+
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+
+    setEmailSuggestions(getEmailSuggestions());
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +68,15 @@ export default function LoginView({
       setIsSubmitting(false);
 
       const isAdmin = email.toLowerCase().includes('admin');
+      const updatedSuggestions = saveEmailSuggestion(email);
+
+      setEmailSuggestions(updatedSuggestions);
+
+      if (rememberMe) {
+        saveRememberEmail(email);
+      } else {
+        removeRememberEmail();
+      }
 
       onLoginSuccess({
         email,
@@ -56,6 +86,27 @@ export default function LoginView({
         major: isAdmin ? 'Phòng Đào tạo' : 'Công nghệ thông tin',
       });
     }, 1200);
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const user = await loginWithGoogle();
+
+      saveGoogleUser(user);
+
+      console.log(user);
+
+      alert(`Xin chào ${user.name}`);
+      onLoginSuccess({
+        email: user.email || '',
+        name: user.name || 'Sinh viên',
+        role: 'student',
+        avatar: user.avatar || '',
+        major: 'Công nghệ thông tin',
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -123,12 +174,19 @@ export default function LoginView({
 
                   <input
                     type="email"
+                    list="email-history"
                     required
                     placeholder="Nhập email của bạn"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="h-14 w-full rounded-xl border border-cyan-400/40 bg-[#031533]/70 pl-12 pr-4 text-white outline-none placeholder:text-cyan-100/45 focus:border-cyan-300 focus:ring-2 focus:ring-cyan-400/20"
                   />
+
+                  <datalist id="email-history">
+                    {emailSuggestions.map((item) => (
+                      <option key={item} value={item} />
+                    ))}
+                  </datalist>
                 </div>
               </div>
 
@@ -203,6 +261,7 @@ export default function LoginView({
               <div className="grid grid-cols-2 gap-4">
                 <button
                   type="button"
+                  onClick={handleGoogleLogin}
                   className="flex h-14 items-center justify-center gap-3 rounded-xl border border-cyan-400/30 bg-[#031533]/50 font-semibold text-white hover:border-cyan-300/70"
                 >
                   <img
