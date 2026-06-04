@@ -4,9 +4,9 @@ import {
   Bot,
   Calendar,
   CircleHelp,
-  CreditCard,
+  CircleDollarSign,
   FileText,
-  LayoutDashboard,
+  Home,
   LogOut,
   Settings,
   User,
@@ -36,7 +36,7 @@ type MenuItem =
 const menu: MenuItem[] = [
   {
     title: 'Dashboard',
-    icon: LayoutDashboard,
+    icon: Home,
     screen: 'STUDENT_DASHBOARD',
   },
   {
@@ -72,7 +72,7 @@ const menu: MenuItem[] = [
   },
   {
     title: 'Học phí',
-    icon: CreditCard,
+    icon: CircleDollarSign,
     screen: 'TUITION',
   },
   {
@@ -105,29 +105,32 @@ export default function Sidebar({
   const logoImage = new URL('../assets/images/logo.png', import.meta.url).href;
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-[292px] shrink-0 border-r border-cyan-500/35 bg-[#020b2d]/95 px-5 py-7 shadow-[0_0_35px_rgba(0,212,255,.18)] backdrop-blur-xl lg:flex lg:flex-col">
+    <aside className="fixed left-0 top-0 bottom-0 w-[280px] z-40 bg-[#020b24] border-r border-[#0d1e3d] flex flex-col px-5 py-6">
+      
+      {/* Brand/Logo */}
       <button
         type="button"
         onClick={() => setScreen('STUDENT_DASHBOARD')}
-        className="mb-10 flex items-center gap-3 px-2 text-left"
+        className="mb-8 flex items-center gap-3 px-2 text-left outline-none"
       >
         <img
           src={logoImage}
           alt="Academia AI"
-          className="h-12 w-12 rounded-xl object-cover shadow-[0_0_18px_rgba(0,212,255,.45)]"
+          className="h-10 w-10 rounded-xl object-cover shadow-[0_0_15px_rgba(0,140,255,.3)]"
         />
-        <span className="text-2xl font-black tracking-wide text-white">
+        <span className="text-xl font-extrabold tracking-wide text-white">
           ACADEMIA AI
         </span>
       </button>
 
-      <nav className="flex-1 overflow-y-auto pr-1">
+      {/* Navigation List */}
+      <nav className="flex-grow overflow-y-auto pr-1">
         {menu.map((item, index) => {
           if ('section' in item) {
             return (
               <h3
                 key={`${item.section}-${index}`}
-                className="mb-3 mt-8 px-2 text-sm font-bold text-cyan-300"
+                className="mb-3 mt-6 px-2 text-[11px] font-bold tracking-wider text-cyan-400 uppercase"
               >
                 {item.section}
               </h3>
@@ -135,26 +138,30 @@ export default function Sidebar({
           }
 
           const Icon = item.icon;
-          const isActive = currentScreen === item.screen;
+          // Sub-pages highlights mapping to parent menu items
+          const isActive = 
+            currentScreen === item.screen ||
+            (item.screen === 'DOCUMENTS' && ['DOCUMENT_DETAIL', 'DOCUMENT_CHAT'].includes(currentScreen)) ||
+            (item.screen === 'PROFILE' && currentScreen === 'SETTINGS');
 
           return (
             <button
               key={item.screen}
               type="button"
               onClick={() => setScreen(item.screen)}
-              className={`mb-2 flex h-16 w-full items-center gap-4 rounded-xl px-4 text-left text-base transition-all ${
+              className={`mb-2 flex h-11 w-full items-center gap-3.5 rounded-xl px-4 text-left text-[14px] font-medium transition-all outline-none border ${
                 isActive
-                  ? 'border border-cyan-400/55 bg-cyan-500/15 text-white shadow-[inset_0_0_26px_rgba(0,140,255,.25),0_0_18px_rgba(0,140,255,.22)]'
-                  : 'text-slate-200 hover:bg-cyan-500/10 hover:text-white'
+                  ? 'border-blue-500/50 bg-blue-600/10 text-white font-semibold'
+                  : 'border-transparent text-slate-300 hover:bg-[#071a3b]/40 hover:text-white'
               }`}
             >
               <Icon
-                size={24}
-                className={isActive ? 'text-cyan-300' : 'text-white'}
+                size={18}
+                className={isActive ? 'text-white' : 'text-slate-400'}
               />
-              <span className="flex-1">{item.title}</span>
+              <span className="flex-grow">{item.title}</span>
               {item.badge && (
-                <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-blue-600 px-2 text-sm font-bold text-white">
+                <span className="flex h-5 min-w-5 items-center justify-center rounded-md bg-blue-700 text-[10px] font-bold text-white px-1.5">
                   {item.badge}
                 </span>
               )}
@@ -163,20 +170,18 @@ export default function Sidebar({
         })}
       </nav>
 
-      <button
-        type="button"
-        onClick={onLogout}
-        className="mt-8 flex h-16 w-full items-center gap-4 rounded-xl border border-cyan-500/25 px-5 text-left text-base text-white transition-all hover:border-red-400/50 hover:bg-red-500/10 hover:text-red-200"
-      >
-        <LogOut size={24} />
-        Đăng xuất
-      </button>
+      {/* Logout at bottom */}
+      <div className="mt-auto border-t border-[#0d1e3d] pt-4">
+        <button
+          type="button"
+          onClick={onLogout}
+          className="flex h-11 w-full items-center gap-3.5 rounded-xl px-4 border border-[#0d1e3d] text-left text-[14px] font-semibold text-slate-300 hover:bg-red-500/10 hover:text-red-300 hover:border-red-500/20 transition-all outline-none"
+        >
+          <LogOut size={18} className="text-slate-400 group-hover:text-red-300" />
+          <span>Đăng xuất</span>
+        </button>
+      </div>
 
-      {user && (
-        <p className="mt-4 truncate px-2 text-xs text-cyan-100/55">
-          {user.email}
-        </p>
-      )}
     </aside>
   );
 }

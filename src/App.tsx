@@ -25,7 +25,7 @@ import DocumentChatView from './pages/ai/DocumentChatView';
 
 import StudentDashboardView from './pages/student/StudentDashboardView';
 import ProfileView from './pages/student/ProfileView';
-import GradesView from './pages/student/GradesView';
+import AcademicResults from './pages/student/AcademicResults';
 import TuitionView from './pages/student/TuitionView';
 import ScheduleView from './pages/student/ScheduleView';
 import NotificationView from './pages/student/NotificationView';
@@ -84,20 +84,12 @@ export default function App() {
 
       case 'CHAT':
         return (
-          <div className="flex min-h-screen bg-[#020817]">
-            <Sidebar
-              currentScreen={screen}
-              setScreen={setScreen}
-              user={user}
-              onLogout={handleLogout}
-            />
-            <ChatView
-              user={user}
-              onNavigateToFiles={() =>
-                setScreen('DOCUMENTS')
-              }
-            />
-          </div>
+          <ChatView
+            user={user}
+            onNavigateToFiles={() =>
+              setScreen('DOCUMENTS')
+            }
+          />
         );
       case 'PROFILE':
   return (
@@ -106,14 +98,8 @@ export default function App() {
       onLogout={handleLogout}
     />
   );
-  case 'GRADES':
-  return (
-    <GradesView
-      onBack={() =>
-        setScreen('STUDENT_DASHBOARD')
-      }
-    />
-  );
+      case 'GRADES':
+        return <AcademicResults user={user} />;
   case 'TUITION':
   return (
     <TuitionView
@@ -122,10 +108,14 @@ export default function App() {
       }
     />
   );
-  case 'SCHEDULE':
-  return (
-    <ScheduleView />
-  );
+      case 'SCHEDULE':
+        return (
+          <ScheduleView
+            setScreen={setScreen}
+            user={user}
+            onLogout={handleLogout}
+          />
+        );
   case 'NOTIFICATION':
   return (
     <NotificationView
@@ -159,45 +149,15 @@ export default function App() {
   case 'ADMIN_DASHBOARD':
   return <AdminDashboardView />;
       case 'FAQ':
-        return (
-          <div className="flex min-h-screen bg-[#020817]">
-            <Sidebar
-              currentScreen={screen}
-              setScreen={setScreen}
-              user={user}
-              onLogout={handleLogout}
-            />
-            <FAQView user={user} />
-          </div>
-        );
+        return <FAQView user={user} />;
 
       case 'DOCUMENTS':
-        return (
-          <div className="flex min-h-screen bg-[#020817]">
-            <Sidebar
-              currentScreen={screen}
-              setScreen={setScreen}
-              user={user}
-              onLogout={handleLogout}
-            />
-            <DocumentsView user={user} />
-          </div>
-        );
+        return <DocumentsView user={user} />;
 
       case 'ANALYTICS':
         return <AnalyticsView />;
       case 'STUDENT_DASHBOARD':
-        return (
-          <div className="flex min-h-screen bg-[#020817]">
-            <Sidebar
-              currentScreen={screen}
-              setScreen={setScreen}
-              user={user}
-              onLogout={handleLogout}
-            />
-            <StudentDashboardView onNavigate={setScreen} />
-          </div>
-        );
+        return <StudentDashboardView onNavigate={setScreen} />;
       default:
         return (
           <LandingView
@@ -211,11 +171,20 @@ export default function App() {
   const isAuthScreen =
     screen === 'LOGIN' ||
     screen === 'REGISTER';
-  const isSidebarScreen =
-    screen === 'STUDENT_DASHBOARD' ||
-    screen === 'CHAT' ||
-    screen === 'FAQ' ||
-    screen === 'DOCUMENTS';
+  const isSidebarScreen = [
+    'STUDENT_DASHBOARD',
+    'CHAT',
+    'FAQ',
+    'DOCUMENTS',
+    'SCHEDULE',
+    'GRADES',
+    'TUITION',
+    'NOTIFICATION',
+    'PROFILE',
+    'SETTINGS',
+    'DOCUMENT_DETAIL',
+    'DOCUMENT_CHAT',
+  ].includes(screen);
 
   const showBottomNav =
     !isAuthScreen &&
@@ -229,7 +198,7 @@ export default function App() {
         isAuthScreen
           ? 'min-h-screen'
           : isSidebarScreen
-            ? 'min-h-screen bg-[#020817] font-sans text-white'
+            ? 'min-h-screen bg-[#020B24] font-sans text-white'
             : 'min-h-screen bg-[#f8f9ff] text-[#0b1c30] flex flex-col justify-between font-sans pb-[76px]'
       }
     >
@@ -243,7 +212,21 @@ export default function App() {
       )}
 
       <div className="flex-grow flex flex-col">
-        {renderActiveScreen()}
+        {isSidebarScreen ? (
+          <div className="flex min-h-screen bg-[#020B24]">
+            <Sidebar
+              currentScreen={screen}
+              setScreen={setScreen}
+              user={user}
+              onLogout={handleLogout}
+            />
+            <main className="ml-[280px] flex-grow min-h-screen bg-[#020B24] text-white flex flex-col">
+              {renderActiveScreen()}
+            </main>
+          </div>
+        ) : (
+          renderActiveScreen()
+        )}
       </div>
 
       {showBottomNav && (
