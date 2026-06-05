@@ -26,7 +26,7 @@ import DocumentChatView from './pages/ai/DocumentChatView';
 import StudentDashboardView from './pages/student/StudentDashboardView';
 import ProfileView from './pages/student/ProfileView';
 import AcademicResults from './pages/student/AcademicResults';
-import TuitionView from './pages/student/TuitionView';
+import TuitionPage from './pages/student/TuitionPage';
 import ScheduleView from './pages/student/ScheduleView';
 import NotificationView from './pages/student/NotificationView';
 
@@ -100,14 +100,8 @@ export default function App() {
   );
       case 'GRADES':
         return <AcademicResults user={user} />;
-  case 'TUITION':
-  return (
-    <TuitionView
-      onBack={() =>
-        setScreen('STUDENT_DASHBOARD')
-      }
-    />
-  );
+      case 'TUITION':
+        return <TuitionPage user={user} />;
       case 'SCHEDULE':
         return (
           <ScheduleView
