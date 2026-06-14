@@ -8,14 +8,15 @@ import {
   Sparkles,
 } from 'lucide-react';
 import AILayout from '../../components/AILayout';
+import { UserSession } from '../../types';
 
 interface GradesViewProps {
   onBack?: () => void;
+  user?: UserSession | null;
 }
 
-export default function GradesView({
-  onBack,
-}: GradesViewProps) {
+export default function GradesView({ onBack, user }: GradesViewProps) {
+  const avatar = user?.avatar || '/assets/images/default-avatar.svg';
   const subjects = [
     {
       name: 'Cơ sở dữ liệu',
@@ -66,22 +67,19 @@ export default function GradesView({
       <div className="min-h-screen bg-gradient-to-b from-[#04152E] via-[#071B3D] to-[#021024] text-white pb-28">
 
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-5 border-b border-white/10">
+      onBack?: () => void;
+      user?: UserSession | null;
 
         <div className="flex items-center gap-3">
           <button onClick={onBack}>
-            <ArrowLeft size={22} />
+      onBack, user
           </button>
-
-          <h1 className="text-xl font-semibold">
+      const avatar = user?.avatar || 'https://i.pravatar.cc/150?img=32';
             Kết quả học tập
           </h1>
         </div>
 
-        <img
-          src="https://i.pravatar.cc/150?img=32"
-          className="w-11 h-11 rounded-full border border-blue-500"
-        />
+        <img src={avatar} className="w-11 h-11 rounded-full border border-blue-500" />
       </div>
 
       {/* Summary */}
@@ -140,7 +138,7 @@ export default function GradesView({
           <span>HK3</span>
           <span>HK4</span>
         </div>
-
+            <img src={avatar} className="w-11 h-11 rounded-full border border-blue-500" />
       </div>
 
       {/* Detail */}

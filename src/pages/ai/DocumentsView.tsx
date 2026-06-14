@@ -101,7 +101,7 @@ export default function DocumentsView({ user }: DocumentsViewProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const displayName = user?.name || 'Thùy Linh';
-  const avatar = user?.avatar || 'https://i.pravatar.cc/150?img=32';
+  const avatar = user?.avatar || '/assets/images/default-avatar.svg';
 
   const filteredDocuments = documents.filter((document) => {
     const matchesSearch =
@@ -260,16 +260,7 @@ export default function DocumentsView({ user }: DocumentsViewProps) {
               />
             </label>
 
-            <button
-              type="button"
-              className="relative flex h-12 w-12 items-center justify-center rounded-full text-white hover:bg-white/10"
-              aria-label="Thông báo"
-            >
-              <Bell size={24} />
-              <span className="absolute right-1 top-0 flex h-6 min-w-6 items-center justify-center rounded-full bg-rose-500 px-1 text-xs font-bold">
-                3
-              </span>
-            </button>
+            {/* Notification icon removed from header */}
 
             <button
               type="button"

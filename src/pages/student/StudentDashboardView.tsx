@@ -16,19 +16,16 @@ import {
   Wallet,
 } from 'lucide-react';
 
-import { ScreenType } from '../../types';
+import { ScreenType, UserSession } from '../../types';
 
 interface StudentDashboardViewProps {
   onNavigate?: (screen: ScreenType) => void;
+  user?: UserSession | null;
 }
 
-export default function StudentDashboardView({
-  onNavigate,
-}: StudentDashboardViewProps) {
-  const robotImage = new URL(
-    '../../assets/images/ai-robot.png',
-    import.meta.url
-  ).href;
+export default function StudentDashboardView({ onNavigate, user }: StudentDashboardViewProps) {
+  const robotImage = new URL('../../assets/images/ai-robot.png', import.meta.url).href;
+  const avatar = user?.avatar || '/assets/images/default-avatar.svg';
 
   return (
     <div className="relative min-h-screen flex-1 overflow-hidden bg-[#020817] text-white">
@@ -46,38 +43,13 @@ export default function StudentDashboardView({
           </div>
 
           <div className="flex flex-wrap items-center gap-5">
-            <label className="relative block w-full min-w-[280px] max-w-md sm:w-[430px]">
-              <Search
-                size={22}
-                className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-200"
-              />
-              <input
-                type="search"
-                placeholder="Tìm kiếm..."
-                className="h-14 w-full rounded-2xl border border-cyan-500/30 bg-[#041534]/75 pl-6 pr-14 text-white outline-none placeholder:text-slate-400 focus:border-cyan-300 focus:ring-2 focus:ring-cyan-400/20"
-              />
-            </label>
-
-            <button
-              type="button"
-              className="relative flex h-12 w-12 items-center justify-center rounded-full text-white hover:bg-white/10"
-              aria-label="Thông báo"
-            >
-              <Bell size={24} />
-              <span className="absolute right-1 top-0 flex h-6 min-w-6 items-center justify-center rounded-full bg-rose-500 px-1 text-xs font-bold">
-                3
-              </span>
-            </button>
+            {/* Notification icon removed from header */}
 
             <button
               type="button"
               className="flex items-center gap-3 rounded-2xl px-2 py-1 hover:bg-white/10"
             >
-              <img
-                src="https://i.pravatar.cc/150?img=32"
-                alt="Thùy Linh"
-                className="h-12 w-12 rounded-full border border-cyan-300/40 object-cover"
-              />
+              <img src={avatar} alt="Thùy Linh" className="h-12 w-12 rounded-full border border-cyan-300/40 object-cover" />
               <span className="font-semibold">Thùy Linh</span>
               <ChevronDown size={18} />
             </button>
@@ -311,7 +283,7 @@ function StatCard({
           <p className="text-sm font-bold text-slate-200">{title}</p>
           <div className="mt-3 flex items-end gap-2">
             <span
-              className={`text-4xl font-black ${
+              className={`text-3xl font-black ${
                 accent === 'rose' ? 'text-rose-400' : 'text-white'
               }`}
             >
@@ -326,12 +298,6 @@ function StatCard({
           {subtitle && <p className="mt-2 text-base text-slate-300">{subtitle}</p>}
         </div>
       </div>
-
-      {sparkline && (
-        <div className="absolute bottom-4 left-7 right-7 h-8">
-          <div className="h-full bg-[linear-gradient(135deg,transparent_0_8%,#00d4ff_8%_10%,transparent_10%_18%,#00d4ff_18%_20%,transparent_20%_30%,#00d4ff_30%_32%,transparent_32%_44%,#00d4ff_44%_46%,transparent_46%_58%,#00d4ff_58%_60%,transparent_60%_76%,#00d4ff_76%_78%,transparent_78%_100%)] opacity-80" />
-        </div>
-      )}
     </div>
   );
 }

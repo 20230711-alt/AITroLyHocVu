@@ -96,6 +96,7 @@ export default function App() {
     <ProfileView
       onBack={() => setScreen('STUDENT_DASHBOARD')}
       onLogout={handleLogout}
+          user={user}
     />
   );
       case 'GRADES':
@@ -116,32 +117,34 @@ export default function App() {
       onBack={() =>
         setScreen('STUDENT_DASHBOARD')
       }
+      user={user}
     />
   );
-  case 'DOCUMENT_DETAIL':
-  return (
-    <DocumentDetailView
-      onBack={() => setScreen('DOCUMENTS')}
-    />
-  );
-  case 'DOCUMENT_CHAT':
-  return (
-    <DocumentChatView
-      onBack={() =>
-        setScreen('DOCUMENT_DETAIL')
-      }
-    />
-  );
+      case 'DOCUMENT_DETAIL':
+        return (
+          <DocumentDetailView
+            onBack={() => setScreen('DOCUMENTS')}
+            user={user}
+          />
+        );
+      case 'DOCUMENT_CHAT':
+        return (
+          <DocumentChatView
+            onBack={() => setScreen('DOCUMENT_DETAIL')}
+            user={user}
+          />
+        );
   case 'SETTINGS':
   return (
     <SettingsView
       onBack={() =>
         setScreen('PROFILE')
       }
+      user={user}
     />
   );
-  case 'ADMIN_DASHBOARD':
-  return <AdminDashboardView />;
+    case 'ADMIN_DASHBOARD':
+      return <AdminDashboardView user={user} />;
       case 'FAQ':
         return <FAQView user={user} />;
 
@@ -151,7 +154,7 @@ export default function App() {
       case 'ANALYTICS':
         return <AnalyticsView />;
       case 'STUDENT_DASHBOARD':
-        return <StudentDashboardView onNavigate={setScreen} />;
+        return <StudentDashboardView onNavigate={setScreen} user={user} />;
       default:
         return (
           <LandingView
@@ -181,10 +184,8 @@ export default function App() {
   ].includes(screen);
 
   const showBottomNav =
-    !isAuthScreen &&
-    ['LANDING', 'ANALYTICS'].includes(
-      screen
-    );
+  !isAuthScreen &&
+  ['ANALYTICS'].includes(screen);
 
   return (
     <div
@@ -193,17 +194,19 @@ export default function App() {
           ? 'min-h-screen'
           : isSidebarScreen
             ? 'min-h-screen bg-[#020B24] font-sans text-white'
-            : 'min-h-screen bg-[#f8f9ff] text-[#0b1c30] flex flex-col justify-between font-sans pb-[76px]'
+            : 'min-h-screen bg-[#f8f9ff] text-[#0b1c30] flex flex-col font-sans'
       }
     >
-      {!isAuthScreen && !isSidebarScreen && (
-        <Header
-          currentScreen={screen}
-          setScreen={setScreen}
-          user={user}
-          onLogout={handleLogout}
-        />
-      )}
+      {!isAuthScreen &&
+ !isSidebarScreen &&
+ screen !== 'LANDING' && (
+  <Header
+    currentScreen={screen}
+    setScreen={setScreen}
+    user={user}
+    onLogout={handleLogout}
+  />
+)}
 
       <div className="flex-grow flex flex-col">
         {isSidebarScreen ? (

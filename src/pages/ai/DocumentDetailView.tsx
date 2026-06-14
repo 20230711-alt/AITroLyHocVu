@@ -12,14 +12,15 @@ import {
   GraduationCap,
   Upload,
 } from 'lucide-react';
+import { UserSession } from '../../types';
 
 interface DocumentDetailViewProps {
   onBack?: () => void;
+  user?: UserSession | null;
 }
 
-export default function DocumentDetailView({
-  onBack,
-}: DocumentDetailViewProps) {
+export default function DocumentDetailView({ onBack, user }: DocumentDetailViewProps) {
+  const avatar = user?.avatar || '/assets/images/default-avatar.svg';
   return (
     <div className="min-h-screen bg-[#04152E] text-white pb-28">
 
@@ -36,11 +37,7 @@ export default function DocumentDetailView({
           </h1>
         </div>
 
-        <img
-          src="https://i.pravatar.cc/150?img=15"
-          alt=""
-          className="w-11 h-11 rounded-full border-2 border-blue-500"
-        />
+        <img src={avatar} alt="" className="w-11 h-11 rounded-full border-2 border-blue-500" />
 
       </div>
 

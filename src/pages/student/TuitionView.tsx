@@ -10,14 +10,15 @@ import {
   Wallet,
 } from 'lucide-react';
 import AILayout from '../../components/AILayout';
+import { UserSession } from '../../types';
 
 interface TuitionViewProps {
   onBack?: () => void;
+  user?: UserSession | null;
 }
 
-export default function TuitionView({
-  onBack,
-}: TuitionViewProps) {
+export default function TuitionView({ onBack, user }: TuitionViewProps) {
+  const avatar = user?.avatar || '/assets/images/default-avatar.svg';
   const transactions = [
     {
       title: 'Thanh toán HK2',
@@ -50,11 +51,7 @@ export default function TuitionView({
           </h1>
         </div>
 
-        <img
-          src="https://i.pravatar.cc/150?img=32"
-          alt=""
-          className="w-11 h-11 rounded-full border-2 border-blue-500"
-        />
+        <img src={avatar} alt="" className="w-11 h-11 rounded-full border-2 border-blue-500" />
       </div>
 
       {/* Summary */}

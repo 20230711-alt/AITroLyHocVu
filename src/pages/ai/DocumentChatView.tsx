@@ -9,14 +9,15 @@ import {
   Send,
   Paperclip,
 } from 'lucide-react';
+import { UserSession } from '../../types';
 
 interface DocumentChatViewProps {
   onBack?: () => void;
+  user?: UserSession | null;
 }
 
-export default function DocumentChatView({
-  onBack,
-}: DocumentChatViewProps) {
+export default function DocumentChatView({ onBack, user }: DocumentChatViewProps) {
+  const avatar = user?.avatar || '/assets/images/default-avatar.svg';
   return (
     <div className="min-h-screen bg-[#020B1F] text-white pb-32">
 
@@ -25,11 +26,7 @@ export default function DocumentChatView({
 
         <div className="flex items-center gap-3">
 
-          <img
-            src="https://i.pravatar.cc/100?img=12"
-            alt=""
-            className="w-12 h-12 rounded-full"
-          />
+          <img src={avatar} alt="" className="w-12 h-12 rounded-full" />
 
           <h1 className="text-4xl font-bold text-blue-100">
             StudyAI

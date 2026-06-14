@@ -32,3 +32,19 @@
     0 0 20px #007bff,
     0 0 60px rgba(0,123,255,.3);
 }
+
+/* Landing page dots */
+
+@keyframes dotsMove {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-50px);
+  }
+}
+
+.moving-dots {
+  animation: dotsMove 8s linear infinite alternate;
+}

@@ -84,18 +84,12 @@ export default function TuitionPage({ user }: TuitionPageProps) {
             <Search size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
           </div>
 
-          {/* Bell */}
-          <button className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-[#071A3B]/60 border border-[#0d1e3d] hover:bg-[#071A3B] transition-colors outline-none">
-            <Bell size={20} className="text-slate-200" />
-            <span className="absolute -top-1.5 -right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#ef4444] px-1 text-[10px] font-extrabold text-white">
-              3
-            </span>
-          </button>
+          {/* Notification icon removed from header */}
 
           {/* Profile */}
           <div className="flex items-center gap-3 bg-[#071A3B]/40 border border-[#0d1e3d]/40 rounded-xl py-1.5 pl-2.5 pr-4">
             <img
-              src={user?.avatar || "https://i.pravatar.cc/150?img=32"}
+              src={user?.avatar || "/assets/images/default-avatar.svg"}
               alt="Avatar"
               className="w-8 h-8 rounded-full border border-cyan-400/20 object-cover"
             />

@@ -15,13 +15,14 @@ import {
   ChevronRight,
 } from 'lucide-react';
 
+import { UserSession } from '../types';
+
 interface SettingsViewProps {
   onBack?: () => void;
+  user?: UserSession | null;
 }
 
-export default function SettingsView({
-  onBack,
-}: SettingsViewProps) {
+export default function SettingsView({ onBack, user }: SettingsViewProps) {
   return (
     <div className="min-h-screen bg-[#04152E] text-white pb-20">
 

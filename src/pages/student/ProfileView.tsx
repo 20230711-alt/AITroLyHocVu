@@ -15,21 +15,18 @@ import {
   FileText,
   Activity,
 } from "lucide-react";
-import { getGoogleUser } from '../../services/localStorageService';
+import { UserSession } from '../../types';
 
 interface ProfileViewProps {
   onBack?: () => void;
   onLogout?: () => void;
+  user?: UserSession | null;
 }
 
-export default function ProfileView({
-  onBack,
-  onLogout,
-}: ProfileViewProps) {
-  const googleUser = getGoogleUser();
-  const profileAvatar = googleUser.avatar || 'https://i.pravatar.cc/200?img=32';
-  const profileName = googleUser.name || 'Thùy Linh Chu Thị';
-  const profileEmail = googleUser.email || 'chuthithuylinh2210@gmail.com';
+export default function ProfileView({ onBack, onLogout, user }: ProfileViewProps) {
+  const profileAvatar = user?.avatar || '/assets/images/default-avatar.svg';
+  const profileName = user?.name || 'Thùy Linh Chu Thị';
+  const profileEmail = user?.email || 'chuthithuylinh2210@gmail.com';
 
   return (
     <div className="min-h-screen bg-[#020f2f] text-white flex">
